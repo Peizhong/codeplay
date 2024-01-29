@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/peizhong/codeplay/cmd"
+	_ "go.uber.org/automaxprocs"
 )
 
 // @title           Codeplay API
