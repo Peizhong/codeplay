@@ -1,0 +1,8 @@
+### mongodb_up 
+http://10.131.249.25:9216/scrape?target=mongodb://10.131.249.25:28028
+
+###
+http://10.131.249.25:9216/scrape?target=mongodb://10.131.249.25:28029
+
+###
+http://10.131.249.25:9216/scrape?target=mongodb://10.131.249.25:28030

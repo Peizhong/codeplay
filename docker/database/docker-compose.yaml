@@ -1,0 +1,113 @@
+version: '3'
+
+# scp ./* peizhong@10.10.10.1:~/source/repos/codeplay/docker/database
+
+services:
+  registry:
+    image: registry
+    container_name: registry
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+    volumes:
+      - registrydata:/data
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    deploy:
+      resources:
+        limits:
+          # cpus: 0.50
+          memory: 256m
+        reservations:
+          # cpus: 0.25
+          memory: 256m
+    environment:
+      MYSQL_ROOT_PASSWORD: app_user
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  redis:
+    image: redis:7
+    restart: always
+    container_name: redis
+    deploy:
+      resources:
+        limits:
+          # cpus: 0.50
+          memory: 32m
+        reservations:
+          # cpus: 0.25
+          memory: 32m
+    ports:
+      - 6379:6379
+    environment:
+      - "TZ=Asia/Shanghai"
+    command: redis-server --loglevel warning --requirepass app_user
+
+  phpmyadmin:
+    restart: always
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - 8086:80
+    volumes:
+      - ./config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+    environment:
+      - "PMA_ARBITRARY=1"
+      - "PMA_HOST=mysql"
+      # hawk test
+      # - "PMA_HOST=10.131.248.27"
+      # - "PMA_HOST=10.131.24.20"
+      # - "PMA_PORT=4330"
+      # - "TZ=Asia/Shanghai"
+
+  mysql-exporter:
+    container_name: mysql-exporter
+    image: prom/mysqld-exporter
+    restart: unless-stopped
+    ports:
+      - 9104:9104
+    environment:
+      - 'MYSQLD_EXPORTER_PASSWORD=app_user'
+    command:
+      - '--mysqld.address=mysql:3306'
+      - '--mysqld.username=app_user'
+    depends_on:
+      - mysql
+  
+  redis-exporter:
+    container_name: redis-exporter
+    image: oliver006/redis_exporter
+    restart: unless-stopped
+    ports:
+      - 9121:9121
+    environment:
+      - "REDIS_ADDR=redis://redis:6379"
+      - "REDIS_PASSWORD=app_user"
+    # command: redis_exporter --redis.addr=redis:6379
+    depends_on:
+      - redis
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      - "POSTGRES_PASSWORD=app_user"
+    #volumes:
+    #  - postgresdata:/var/lib/postgresql/data
+
+volumes:
+  dbdata:
+  registrydata:
+  #postgresdata:

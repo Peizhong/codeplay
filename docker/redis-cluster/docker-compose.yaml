@@ -1,0 +1,69 @@
+version: '3'
+
+# scp ./* peizhong@10.10.10.1:~/source/repos/codeplay/docker/redis-cluster
+
+services:
+  redis-1:
+    image: redis:7
+    container_name: redis-1
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes --requirepass app_user
+    ports:
+      - 7001:6379
+  redis-2:
+    image: redis:7
+    container_name: redis-2
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes --requirepass app_user
+    ports:
+      - 7002:6379
+    depends_on:
+      - redis-1
+  redis-3:
+    image: redis:7
+    container_name: redis-3
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes --requirepass app_user
+    ports:
+      - 7003:6379
+    depends_on:
+      - redis-1
+      - redis-2
+  redis-4:
+    image: redis:7
+    container_name: redis-4
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes --requirepass app_user
+    ports:
+      - 7004:6379
+    depends_on:
+      - redis-1
+      - redis-2
+  redis-5:
+    image: redis:7
+    container_name: redis-5
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes --requirepass app_user
+    ports:
+      - 7005:6379
+    depends_on:
+      - redis-1
+      - redis-2 
+  redis-6:
+    image: redis:7
+    container_name: redis-6
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes --requirepass app_user
+    ports:
+      - 7006:6379
+    depends_on:
+      - redis-1
+      - redis-2
+
+  redis-exporter:
+    image: oliver006/redis_exporter
+    container_name: redis-exporter
+    ports:
+      - 9121:9121
+    environment:
+      #- "REDIS_ADDR=redis://redis-1:6379"
+      - "XREDIS_PASSWORD=app_user"
+    # command: redis_exporter --redis.addr=redis-1:6379,redis-2:6379
+    depends_on:
+      - redis-1
+
+#  redis-cli --cluster create redis-1:6379 redis-2:6379 redis-3:6379 redis-4:6379 redis-5:6379 redis-6:6379 --cluster-replicas 1 -a app_user

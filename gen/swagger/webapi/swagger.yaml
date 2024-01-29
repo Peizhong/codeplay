@@ -1,0 +1,39 @@
+definitions:
+  gin.H:
+    additionalProperties: {}
+    type: object
+  web.EchoRequest:
+    properties:
+      message:
+        type: string
+    required:
+    - message
+    type: object
+info:
+  contact: {}
+  title: Codeplay API
+  version: "1.0"
+paths:
+  /api/echo:
+    post:
+      consumes:
+      - application/json
+      description: response message
+      parameters:
+      - description: Request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/web.EchoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Echo
+      tags:
+      - cloud
+swagger: "2.0"

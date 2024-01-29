@@ -1,0 +1,33 @@
+groups:
+- name: common
+  rules:
+  - alert: ProcessGoroutineIncrease
+    expr: delta(go_goroutines[5m]) > 10
+    for: 3m
+    labels:
+      severity: page
+    annotations:
+      summary: Process goroutine increase
+  - alert: ProcessMemoryIncrease
+    expr: delta(process_resident_memory_bytes[5m]) / 1024 / 1024 > 10
+    for: 3m
+    labels:
+      severity: page
+    annotations:
+      summary: Process memory increase
+- name: n9e
+  rules:
+  - alert: RuleEvaluationHighLatency
+    expr: histogram_quantile(0.95, sum(rate(n9e_server_prom_rule_eval_duration_seconds_bucket[5m])) by (le,job,n9e_cluster)) > 0.1
+    # for: 10m
+    labels:
+      severity: page
+    annotations:
+      summary: High rule evaluation latency
+  - alert: RuleEvaluationHasError
+    expr: sum (increase(n9e_server_prom_rule_eval_status_code_total{status_code!='success'}[5m])) by (instance,n9e_cluster,n9e_group_id) > 0
+    # for: 10m
+    labels:
+      severity: page
+    annotations:
+      summary: Rule evaluation has error

@@ -1,0 +1,103 @@
+version: '3'
+
+# scp ./* peizhong@10.10.10.1:~/source/repos/codeplay/docker/kafka
+
+services:
+  kafka-0:
+    image: bitnami/kafka:latest
+    container_name: kafka-0
+    restart: always
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    deploy:
+      resources:
+        limits:
+          # cpus: 0.50
+          memory: 500m
+        reservations:
+          # cpus: 0.25
+          memory: 500m
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@10.10.10.1:9093,1@10.10.10.1:9193,2@10.10.10.1:9293
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://10.10.10.1:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      # Clustering
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=2
+
+  kafka-1:
+    image: bitnami/kafka:latest
+    container_name: kafka-1
+    restart: always
+    ports:
+      - "9192:9192"
+      - "9193:9193"
+    deploy:
+      resources:
+        limits:
+          # cpus: 0.50
+          memory: 500m
+        reservations:
+          # cpus: 0.25
+          memory: 500m
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@10.10.10.1:9093,1@10.10.10.1:9193,2@10.10.10.1:9293
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9193
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://10.10.10.1:9192
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      # Clustering
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=2
+
+  kafka-2:
+    image: bitnami/kafka:latest
+    container_name: kafka-2
+    restart: always
+    ports:
+      - "9292:9292"
+      - "9293:9293"
+    deploy:
+      resources:
+        limits:
+          # cpus: 0.50
+          memory: 500m
+        reservations:
+          # cpus: 0.25
+          memory: 500m
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=2
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@10.10.10.1:9093,1@10.10.10.1:9193,2@10.10.10.1:9293
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9292,CONTROLLER://:9293
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://10.10.10.1:9292
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      # Clustering
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=2

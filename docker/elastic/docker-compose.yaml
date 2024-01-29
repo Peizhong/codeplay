@@ -1,0 +1,69 @@
+version: '3'
+
+# scp docker-compose.yaml peizhong@10.10.10.1:~/source/repos/codeplay/docker/elastic
+# sudo find /var/lib/docker/containers/ -type f -name "*.log" -delete
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.14
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - "TZ=Asia/Shanghai"
+      - "discovery.type=single-node"
+      # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    deploy:
+        resources:
+            limits:
+              # cpus: 0.50
+              memory: 1g
+            reservations:
+              # cpus: 0.25
+              memory: 512m
+    ports:
+      - 9200:9200
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.14
+    container_name: kibana
+    restart: always
+    depends_on:
+      - elasticsearch
+    environment:
+      - "TZ=Asia/Shanghai"
+      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+      # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    deploy:
+        resources:
+            limits:
+              # cpus: 0.50
+              memory: 1g
+            reservations:
+              # cpus: 0.25
+              memory: 256m
+    ports:
+      - 5601:5601
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.50
+    container_name: jaeger
+    restart: always
+    depends_on:
+      - elasticsearch
+    environment:
+      - "COLLECTOR_ZIPKIN_HOST_PORT=:9411"
+      - "QUERY_ENABLE_TRACING=false"
+      - "SPAN_STORAGE_TYPE=elasticsearch"
+      - "ES_SERVER_URLS=http://elasticsearch:9200"
+      - "MEMORY_MAX_TRACES=1000"
+    deploy:
+        resources:
+            limits:
+              # cpus: 0.50
+              memory: 512m
+            reservations:
+              # cpus: 0.25
+              memory: 128m
+    ports:
+      - 16686:16686
+      - 4318:4318

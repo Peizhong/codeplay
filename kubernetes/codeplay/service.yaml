@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeplay-deployment
+  labels:
+    app: codeplay
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: codeplay
+  template:
+    metadata:
+      labels:
+        app: codeplay 
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port:   '3000'
+    spec:
+      containers:
+      - name: codeplay
+        image: 10.10.10.1:5000/codeplay:v0.1.4
+        args: ["web"]
+        env:
+        - name: GIN_MODE
+          value: "release"
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 3000
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 3000
+        ports:
+        - containerPort: 3000
+          name: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: codeplay-service
+spec:
+  selector:
+    app: codeplay
+  type: NodePort  
+  ports:
+  - name: codeplay-http-port
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+    nodePort: 30000
+
+
+# scp ./* peizhong@10.10.10.1:~/source/repos/codeplay/kubernetes/codeplay/

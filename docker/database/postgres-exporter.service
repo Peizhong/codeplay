@@ -1,0 +1,10 @@
+[Unit]
+Description=mz postgres exporter service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/postgres_exporter 
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

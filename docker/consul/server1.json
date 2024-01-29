@@ -1,0 +1,29 @@
+{
+  "node_name": "consul-server1",
+  "server": true,
+  "ui_config": {
+    "enabled": true
+  },
+  "data_dir": "/consul/data",
+  "addresses": {
+    "http": "0.0.0.0"
+  },
+  "retry_join": [
+    "consul-server1",
+    "consul-server2"
+  ],
+  "telemetry": {
+    "disable_hostname":true,
+    "prometheus_retention_time":"1h",
+    "prefix_filter": [
+      "-consul.raft.boltdb",
+      "-consul.memberlist",
+      "-consul.raft",
+      "-consul.fsm"
+    ]
+  },
+  "encrypt": "aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=",
+  "verify_incoming": false,
+  "verify_outgoing": false,
+  "verify_server_hostname": false
+}
