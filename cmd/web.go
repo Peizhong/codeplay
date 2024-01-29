@@ -11,7 +11,9 @@ import (
 	"github.com/google/gops/agent"
 	"github.com/oklog/run"
 	"github.com/peizhong/codeplay/config"
+	"github.com/peizhong/codeplay/pkg/cache"
 	"github.com/peizhong/codeplay/pkg/logger"
+	"github.com/peizhong/codeplay/service/naming"
 	"github.com/peizhong/codeplay/service/web"
 	"github.com/spf13/cobra"
 )
@@ -20,12 +22,25 @@ func init() {
 	rootCmd.AddCommand(webCmd)
 }
 
+func initModules() error {
+	if config.C.RedisAddr != "" {
+		if err := cache.InitShareCache(config.C.RedisAddr, config.C.RedisPassword); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 var webCmd = &cobra.Command{
 	Use:   "web",
 	Short: "run web service",
 	Run: func(cmd *cobra.Command, args []string) {
 		rootCtx, cancel := context.WithCancel(context.Background())
 		defer cancel()
+
+		if err := initModules(); err != nil {
+			logger.Sugar().Fatalf("init modules error: %v", err)
+		}
 
 		g := &run.Group{}
 		g.Add(run.SignalHandler(rootCtx, os.Interrupt, syscall.SIGTERM))
@@ -53,6 +68,9 @@ var webCmd = &cobra.Command{
 			}, func(err error) {
 				cancel()
 			})
+		}
+		if config.C.RedisAddr != "" {
+			naming.RegisterService(g, config.C.Hostname)
 		}
 		g.Run()
 	},
