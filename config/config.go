@@ -8,16 +8,18 @@ import (
 )
 
 type Config struct {
+	Hostname     string `env:"CODEPLAY_HOSTNAME"`
 	HttpPort     int    `env:"CODEPLAY_HTTP_PORT" envDefault:"3000"`
 	FeatureGates string `env:"CODEPLAY_FEATURE_GATES" envDefault:"{}"`
 }
 
 var C Config
-var HostName string
 
-func Init() {
-	HostName, _ = os.Hostname()
+func init() {
 	env.Parse(&C)
+	if C.Hostname == "" {
+		C.Hostname, _ = os.Hostname()
+	}
 }
 
 func (c Config) GetFeature(name string) gjson.Result {

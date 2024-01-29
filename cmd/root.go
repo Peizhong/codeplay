@@ -3,9 +3,15 @@ package cmd
 import (
 	"os"
 
-	"github.com/peizhong/codeplay/config"
 	"github.com/peizhong/codeplay/pkg/logger"
+	"github.com/peizhong/codeplay/pkg/stat"
 	"github.com/spf13/cobra"
+)
+
+var (
+	BuildDate string
+	GitBranch string
+	GitCommit string
 )
 
 var rootCmd = &cobra.Command{
@@ -17,14 +23,15 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	config.Init()
-
 	logger.InitLogger()
-	defer logger.Flush()
+	stat.RegisterSystemMetrics(GitBranch, GitCommit, BuildDate)
 
-	if err := rootCmd.Execute(); err != nil {
+	err := rootCmd.Execute()
+	if err != nil {
 		logger.Sugar().Warnln("root cmd exited with err", err.Error())
+	}
+	logger.Flush()
+	if err != nil {
 		os.Exit(1)
 	}
-	logger.Sugar().Infoln("root cmd exited :)")
 }

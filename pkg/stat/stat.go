@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/version"
 )
 
 var (
@@ -28,4 +29,11 @@ func RecordRequest(url, method string, code int) {
 
 func RecordRequestDuration(url, method string, seconds float64) {
 	httpRequestDuration.WithLabelValues(url, method).Observe(seconds)
+}
+
+func RegisterSystemMetrics(gitBranch, gitCommit, buildDate string) {
+	version.Branch = gitBranch
+	version.Revision = gitCommit
+	version.BuildDate = buildDate
+	prometheus.MustRegister(version.NewCollector("codeplay"))
 }

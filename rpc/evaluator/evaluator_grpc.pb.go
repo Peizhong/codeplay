@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: rpc/evaluator/evaluator.proto
+// source: evaluator/evaluator.proto
 
 package evaluator
 
@@ -103,5 +103,5 @@ var Evaluator_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "rpc/evaluator/evaluator.proto",
+	Metadata: "evaluator/evaluator.proto",
 }

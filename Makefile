@@ -1,8 +1,11 @@
 .PHONY: proto
 
 proto: 
-	protoc --go_out=. --go_opt=paths=source_relative \
-        --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+	protoc -I=./rpc/ \
+		--go_out=./rpc/ --go_opt=paths=source_relative \
+    	--go-grpc_out=./rpc/ --go-grpc_opt=paths=source_relative \
+		--grpc-gateway_out=./rpc/ --grpc-gateway_opt paths=source_relative --grpc-gateway_opt generate_unbound_methods=true \
+		--openapiv2_out ./gen/openapiv2 \
         rpc/evaluator/evaluator.proto
 
 	mockgen github.com/peizhong/codeplay/rpc/evaluator EvaluatorClient > ./gen/mock_evaluator/mock_evaluator.go
@@ -10,13 +13,15 @@ proto:
 swag:
 	swag init -d . --parseDependency --output ./gen/swagger/webapi
 
+docker_build:
+	sudo docker build -t 10.10.10.1:5000/codeplay:v0.0.1 .
+	# sudo docker push 10.10.10.1:5000/codeplay:v0.1.4
 
-build_builder:
-	sudo docker build -f builder.Dockerfile -t codeplay:v0.0.1-builder .
+docker_run:
+	sudo docker run --rm -it 10.10.10.1:5000/codeplay:v0.0.1 sh
 
-build_app:
-	sudo docker build -f app.Dockerfile -t 10.10.10.1:5000/codeplay:v0.1.4 .
-	sudo docker push 10.10.10.1:5000/codeplay:v0.1.4
+local_run:
+	CODEPLAY_FEATURE_GATES="{\"enable_gops\":true}" go run main.go web
 
 sync_k8s:
 	scp ./kubernetes/codeplay/*.yaml peizhong@10.10.10.1:~/source/repos/codeplay/kubernetes/codeplay/

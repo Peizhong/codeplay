@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 	"syscall"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/gops/agent"
 	"github.com/oklog/run"
 	"github.com/peizhong/codeplay/config"
 	"github.com/peizhong/codeplay/pkg/logger"
@@ -40,11 +40,20 @@ var webCmd = &cobra.Command{
 			logger.Sugar().Infoln("start web service on", srv.Addr)
 			return srv.ListenAndServe()
 		}, func(err error) {
-			timeoutCtx, fn := context.WithTimeout(context.Background(), time.Second*2)
-			defer fn()
-			srv.Shutdown(timeoutCtx)
+			srv.Shutdown(context.TODO())
 		})
-
+		if config.C.GetFeature("enable_gops").Bool() {
+			g.Add(func() error {
+				if err := agent.Listen(agent.Options{}); err != nil {
+					return err
+				}
+				logger.Sugar().Infoln("gops service started")
+				<-rootCtx.Done()
+				return nil
+			}, func(err error) {
+				cancel()
+			})
+		}
 		g.Run()
 	},
 }

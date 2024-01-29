@@ -1,16 +1,22 @@
 syntax = "proto3";
+package evaluator;
 
 option go_package = "github.com/peizhong/codeplay/rpc/evaluator";
 option java_multiple_files = true;
 option java_package = "peizhong.evaluator";
 option java_outer_classname = "EvaluatorProto";
 
-package evaluator;
+import "google/api/annotations.proto";
 
 // The greeting service definition.
 service Evaluator {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+      option (google.api.http) = {
+          post: "/rpc/evaluator/v1/say_hello"
+          body: "*"
+      };
+  }
 }
 
 // The request message containing the user's name.

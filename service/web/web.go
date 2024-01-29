@@ -1,20 +1,41 @@
 package web
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/peizhong/codeplay/config"
+	_ "github.com/peizhong/codeplay/gen/openapiv2/evaluator"
 	_ "github.com/peizhong/codeplay/gen/swagger/webapi"
+	rpc_evaluator "github.com/peizhong/codeplay/rpc/evaluator"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerfiles "github.com/swaggo/files"     // swagger embed files
 	ginswagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
+func registerEvaluatorGateway(r *gin.Engine, rpcAddr string) {
+	// http://localhost:3000/swagger/evaluator/index.html
+	r.GET("/swagger/evaluator/*any", ginswagger.CustomWrapHandler(&ginswagger.Config{
+		URL:          "doc.json",
+		InstanceName: "evaluator",
+	}, swaggerfiles.Handler))
+
+	gwmux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	if err := rpc_evaluator.RegisterEvaluatorHandlerFromEndpoint(context.Background(), gwmux, rpcAddr, opts); err != nil {
+		panic(fmt.Errorf("failed to register gRPC gateway: %v", err))
+	}
+	r.Any("/rpc/evaluator/*any", gin.WrapH(gwmux))
+}
+
 func registerSwaggerApi(r *gin.Engine) {
-	// local: http://localhost:3000/-/swagger/webapi/index.html#
-	// vm: http://10.10.10.1:30000/-/swagger/webapi/index.html#
-	r.GET("/-/swagger/webapi/*any", ginswagger.WrapHandler(swaggerfiles.Handler))
+	// http://localhost:3000/swagger/webapi/index.html#
+	r.GET("/swagger/webapi/*any", ginswagger.WrapHandler(swaggerfiles.Handler))
 }
 
 func registerBasicApi(r *gin.Engine) {
@@ -32,6 +53,7 @@ func RegisterRoutes(r *gin.Engine) {
 	registerSwaggerApi(r)
 	registerBasicApi(r)
 	registerLogicApi(r)
+	registerEvaluatorGateway(r, ":9090")
 }
 
 type EchoRequest struct {
@@ -54,6 +76,6 @@ func echo(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message":  req.Message,
-		"hostname": config.HostName,
+		"hostname": config.C.Hostname,
 	})
 }
