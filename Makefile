@@ -1,6 +1,6 @@
 .PHONY: proto
 
-proto: 
+proto:
 	protoc -I=./rpc/ \
 		--go_out=./rpc/ --go_opt=paths=source_relative \
     	--go-grpc_out=./rpc/ --go-grpc_opt=paths=source_relative \
@@ -8,6 +8,7 @@ proto:
 		--openapiv2_out ./gen/openapiv2 \
         rpc/evaluator/evaluator.proto
 
+	# go install go.uber.org/mock/mockgen@latest
 	mockgen github.com/peizhong/codeplay/rpc/evaluator EvaluatorClient > ./gen/mock_evaluator/mock_evaluator.go
 
 swag:

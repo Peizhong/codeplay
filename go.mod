@@ -5,7 +5,6 @@ go 1.20
 require (
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/golang/mock v1.6.0
 	github.com/google/gops v0.3.28
 	github.com/google/uuid v1.3.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0
@@ -23,7 +22,7 @@ require (
 	github.com/swaggo/swag v1.16.2
 	github.com/tidwall/gjson v1.17.0
 	go.uber.org/automaxprocs v1.5.3
-	go.uber.org/mock v0.3.0
+	go.uber.org/mock v0.4.0
 	go.uber.org/zap v1.26.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240102182953-50ed04b92917
 	google.golang.org/grpc v1.60.1
