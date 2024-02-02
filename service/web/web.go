@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/peizhong/codeplay/config"
@@ -54,6 +55,12 @@ func RegisterRoutes(r *gin.Engine) {
 	registerBasicApi(r)
 	registerLogicApi(r)
 	registerEvaluatorGateway(r, ":9090")
+	if config.C.GetFeature("enable_pprof").Bool() {
+		// http://localhost:3000/debug/pprof/
+		// go tool pprof -http=:8081 http://localhost:3000/debug/pprof/profile
+		//  go tool trace trace.out
+		pprof.Register(r)
+	}
 }
 
 type EchoRequest struct {

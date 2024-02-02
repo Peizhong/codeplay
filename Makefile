@@ -22,7 +22,7 @@ docker_run:
 	sudo docker run --rm -it 10.10.10.1:5000/codeplay:v0.0.1 sh
 
 local_run:
-	CODEPLAY_FEATURE_GATES="{\"enable_gops\":true}" go run main.go web
+	CODEPLAY_FEATURE_GATES="{\"enable_gops\":true,\"enable_pprof\":true}" go run main.go web
 
 sync_k8s:
 	scp ./kubernetes/codeplay/*.yaml peizhong@10.10.10.1:~/source/repos/codeplay/kubernetes/codeplay/
