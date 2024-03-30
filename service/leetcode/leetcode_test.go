@@ -27,6 +27,10 @@ func TestHello(t *testing.T) {
 }
 
 func TestAll(t *testing.T) {
+	t.Run("two pointer", func(t *testing.T) {
+		v := twoPointersDemo_maxArea([]int{1, 8, 6, 2, 5, 4, 8, 3, 7})
+		t.Log(v)
+	})
 	t.Run("slide window", func(t *testing.T) {
 		slideWindowDemo_LengthOfLongestSubstring("abcabcbb")
 	})
