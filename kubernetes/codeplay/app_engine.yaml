@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-engine-deployment
+  labels:
+    app: app-engine
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-engine
+  template:
+    metadata:
+      labels:
+        app: app-engine
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port:   '3000'
+    spec:
+      containers:
+      - name: app-engine
+        image: registry.cn-shenzhen.aliyuncs.com/peizhong/codeplay:v0.0.1
+        resources:
+          limits:
+            cpu: 20m
+            memory: 64Mi
+        args: ["./codeplay","app_engine"]
+        env:
+        - name: GIN_MODE
+          value: "release"
+        ports:
+        - containerPort: 3000
+          name: http

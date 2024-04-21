@@ -29,3 +29,8 @@ sync_k8s:
 
 sync_docker:
 	scp ./docker/kafka/* peizhong@10.10.10.1:~/source/repos/codeplay/docker/kafka
+
+fast_build:
+	- sudo docker rmi registry.cn-shenzhen.aliyuncs.com/peizhong/codeplay:v0.0.1
+	sudo docker build -f fast.Dockerfile -t registry.cn-shenzhen.aliyuncs.com/peizhong/codeplay:v0.0.1 .
+	sudo docker push registry.cn-shenzhen.aliyuncs.com/peizhong/codeplay:v0.0.1

@@ -2,6 +2,14 @@ package leetcode
 
 import "testing"
 
+func TestPlay(t *testing.T) {
+	t.Run("hello", func(t *testing.T) {
+		root := BuildListNode([]int{1, 2, 3, 4, 5})
+		rev := reverseLinkedList(root)
+		t.Log(rev)
+	})
+}
+
 func TestList(t *testing.T) {
 	list := []*Node{
 		{

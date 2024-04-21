@@ -1,9 +1,9 @@
 ARG APP_NAME=codeplay
 
-FROM golang:1.21-alpine AS builder
+FROM peizhong/go_builder:v24.4.21 AS builder
 ARG APP_NAME
 ENV CGO_ENABLED=0 GOPROXY="https://goproxy.cn,direct"
-RUN apk add git
+# RUN apk add git
 RUN go install github.com/google/gops@latest
 WORKDIR /build
 COPY . .
