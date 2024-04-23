@@ -15,8 +15,9 @@ spec:
         app: app-engine
       annotations:
         prometheus.io/scrape: 'true'
-        prometheus.io/port:   '3000'
+        prometheus.io/port:   '8080'
     spec:
+      serviceAccountName: app-user
       containers:
       - name: app-engine
         image: registry.cn-shenzhen.aliyuncs.com/peizhong/codeplay:v0.0.1
@@ -29,5 +30,11 @@ spec:
         - name: GIN_MODE
           value: "release"
         ports:
-        - containerPort: 3000
+        - containerPort: 8080
           name: http
+        livenessProbe:
+          httpGet:
+            path: '/-/healthy'
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 10

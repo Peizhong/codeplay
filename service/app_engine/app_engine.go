@@ -4,6 +4,11 @@ import (
 	"context"
 
 	"github.com/peizhong/codeplay/pkg/logger"
+	"gopkg.in/yaml.v3"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	//
@@ -38,27 +43,104 @@ func InitInClusterK8sClient() error {
 }
 
 type AbstractContainer struct {
-	Name  string
-	Image string
+	Name  string `json:"name"`
+	Image string `json:"image"`
 	Ports []struct {
-		Name          string
-		ContainerPort uint16
-		Proto         string
+		Name          string `json:"name"`
+		ContainerPort uint16 `json:"container_port"`
+		Proto         string `json:"proto"`
+	} `json:"ports"`
+	Limits struct {
+		Cpu    string
+		Memory string
+	} `json:"limits"`
+	Command []string `json:"command"`
+}
+
+func (c *AbstractContainer) ConvertToK8sContainer() (*corev1.Container, error) {
+	container := &corev1.Container{
+		Name:  c.Name,
+		Image: c.Image,
 	}
+	container.Command = append(container.Command, c.Command...)
+	container.Resources.Limits = make(corev1.ResourceList)
+	if c.Limits.Cpu != "" {
+		if quantity, err := resource.ParseQuantity(c.Limits.Cpu); err == nil {
+			container.Resources.Limits[corev1.ResourceCPU] = quantity
+		}
+	}
+	if c.Limits.Memory != "" {
+		if quantity, err := resource.ParseQuantity(c.Limits.Memory); err == nil {
+			container.Resources.Limits[corev1.ResourceMemory] = quantity
+		}
+	}
+	return container, nil
 }
 
 type AbstractApp struct {
-	Namespace   string
-	Name        string
-	Labels      map[string]string
-	Annotations map[string]string
-	Containers  []AbstractContainer
+	Namespace   string               `json:"namespace"`
+	Name        string               `json:"name"`
+	Labels      map[string]string    `json:"labels"`
+	Annotations map[string]string    `json:"annotations"`
+	Containers  []*AbstractContainer `json:"containers"`
 }
 
-func CreateApp(ctx context.Context, app AbstractApp) error {
-	return nil
+func (app *AbstractApp) ConvertToK8sDeployment() (*appsv1.Deployment, error) {
+	deployment := &appsv1.Deployment{}
+	deployment.Name = app.Name
+	deployment.Spec.Selector = &metav1.LabelSelector{
+		MatchLabels: map[string]string{
+			"app": app.Name,
+		},
+	}
+	deployment.Spec.Template.Labels = map[string]string{
+		"app": app.Name,
+	}
+	for k, v := range app.Labels {
+		deployment.Spec.Template.Labels[k] = v
+	}
+	deployment.Spec.Template.Annotations = map[string]string{
+		"prometheus.io/scrape": "true",
+	}
+	for k, v := range app.Annotations {
+		deployment.Spec.Template.Annotations[k] = v
+	}
+	deployment.Spec.Template.Spec.ServiceAccountName = "app-user"
+	for _, ac := range app.Containers {
+		container, err := ac.ConvertToK8sContainer()
+		if err != nil {
+			continue
+		}
+		deployment.Spec.Template.Spec.Containers = append(deployment.Spec.Template.Spec.Containers, *container)
+	}
+	return deployment, nil
+}
+
+func CreateApp(ctx context.Context, app *AbstractApp) error {
+	deployment, err := app.ConvertToK8sDeployment()
+	if err != nil {
+		return err
+	}
+	bs, _ := yaml.Marshal(deployment)
+	logger.ToFile("deploy.txt", bs)
+	_, err = clientSet.AppsV1().Deployments(app.Namespace).Create(ctx, deployment, metav1.CreateOptions{})
+	return err
 }
 
 func UpdateAppImage(ctx context.Context, app AbstractApp) error {
 	return nil
+}
+
+func ListPod(ctx context.Context, namespace string) ([]string, error) {
+	list, err := clientSet.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{
+		Limit: 10,
+	})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]string, 0, len(list.Items))
+	for _, item := range list.Items {
+		result = append(result, item.Name)
+	}
+	return result, nil
 }

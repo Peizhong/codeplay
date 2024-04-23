@@ -39,7 +39,7 @@ func registerSwaggerApi(r *gin.Engine) {
 	r.GET("/swagger/webapi/*any", ginswagger.WrapHandler(swaggerfiles.Handler))
 }
 
-func registerBasicApi(r *gin.Engine) {
+func RegisterBasicApi(r *gin.Engine) {
 	r.GET("/-/healthy", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{}) })
 	r.GET("/-/ready", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{}) })
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
@@ -52,7 +52,7 @@ func registerLogicApi(r *gin.Engine) {
 
 func RegisterRoutes(r *gin.Engine) {
 	registerSwaggerApi(r)
-	registerBasicApi(r)
+	RegisterBasicApi(r)
 	registerLogicApi(r)
 	registerEvaluatorGateway(r, ":9090")
 	if config.C.GetFeature("enable_pprof").Bool() {

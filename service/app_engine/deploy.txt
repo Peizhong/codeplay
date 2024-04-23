@@ -1,0 +1,125 @@
+typemeta:
+    kind: ""
+    apiversion: ""
+objectmeta:
+    name: test
+    generatename: ""
+    namespace: ""
+    selflink: ""
+    uid: ""
+    resourceversion: ""
+    generation: 0
+    creationtimestamp: "0001-01-01T00:00:00Z"
+    deletiontimestamp: null
+    deletiongraceperiodseconds: null
+    labels: {}
+    annotations: {}
+    ownerreferences: []
+    finalizers: []
+    managedfields: []
+spec:
+    replicas: null
+    selector:
+        matchlabels:
+            app: test
+        matchexpressions: []
+    template:
+        objectmeta:
+            name: ""
+            generatename: ""
+            namespace: ""
+            selflink: ""
+            uid: ""
+            resourceversion: ""
+            generation: 0
+            creationtimestamp: "0001-01-01T00:00:00Z"
+            deletiontimestamp: null
+            deletiongraceperiodseconds: null
+            labels:
+                app: test
+            annotations:
+                prometheus.io/scrape: "true"
+            ownerreferences: []
+            finalizers: []
+            managedfields: []
+        spec:
+            volumes: []
+            initcontainers: []
+            containers:
+                - name: nginx
+                  image: nginx:1.14.2
+                  command: []
+                  args: []
+                  workingdir: ""
+                  ports: []
+                  envfrom: []
+                  env: []
+                  resources:
+                    limits: {}
+                    requests: {}
+                    claims: []
+                  volumemounts: []
+                  volumedevices: []
+                  livenessprobe: null
+                  readinessprobe: null
+                  startupprobe: null
+                  lifecycle: null
+                  terminationmessagepath: ""
+                  terminationmessagepolicy: ""
+                  imagepullpolicy: ""
+                  securitycontext: null
+                  stdin: false
+                  stdinonce: false
+                  tty: false
+            ephemeralcontainers: []
+            restartpolicy: ""
+            terminationgraceperiodseconds: null
+            activedeadlineseconds: null
+            dnspolicy: ""
+            nodeselector: {}
+            serviceaccountname: app-user
+            deprecatedserviceaccount: ""
+            automountserviceaccounttoken: null
+            nodename: ""
+            hostnetwork: false
+            hostpid: false
+            hostipc: false
+            shareprocessnamespace: null
+            securitycontext: null
+            imagepullsecrets: []
+            hostname: ""
+            subdomain: ""
+            affinity: null
+            schedulername: ""
+            tolerations: []
+            hostaliases: []
+            priorityclassname: ""
+            priority: null
+            dnsconfig: null
+            readinessgates: []
+            runtimeclassname: null
+            enableservicelinks: null
+            preemptionpolicy: null
+            overhead: {}
+            topologyspreadconstraints: []
+            sethostnameasfqdn: null
+            os: null
+            hostusers: null
+            schedulinggates: []
+            resourceclaims: []
+    strategy:
+        type: ""
+        rollingupdate: null
+    minreadyseconds: 0
+    revisionhistorylimit: null
+    paused: false
+    progressdeadlineseconds: null
+status:
+    observedgeneration: 0
+    replicas: 0
+    updatedreplicas: 0
+    readyreplicas: 0
+    availablereplicas: 0
+    unavailablereplicas: 0
+    conditions: []
+    collisioncount: null

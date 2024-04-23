@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"os"
 	"sync"
 
 	"go.uber.org/zap"
@@ -69,6 +70,15 @@ func Flush() {
 	if sl2 != nil {
 		sl2.Sync()
 	}
+}
+
+func ToFile(fileName string, bs []byte) {
+	fs, err := os.Create(fileName)
+	if err != nil {
+		return
+	}
+	fs.Write(bs)
+	fs.Close()
 }
 
 func GetInfoLogger() Interface {
