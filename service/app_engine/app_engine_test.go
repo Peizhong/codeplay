@@ -25,8 +25,8 @@ func TestHttpApi(t *testing.T) {
 
 func TestCreateA(t *testing.T) {
 	err := CreateApp(context.Background(), &AbstractApp{
-		Namespace: "default",
-		Name:      "test",
+		Namespace: "dev",
+		Name:      "test-nginx",
 		Containers: []*AbstractContainer{
 			{
 				Name:  "nginx",

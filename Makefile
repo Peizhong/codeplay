@@ -34,3 +34,7 @@ fast_build:
 	- sudo docker rmi registry.cn-shenzhen.aliyuncs.com/peizhong/codeplay:v0.0.2
 	sudo docker build -f fast.Dockerfile -t registry.cn-shenzhen.aliyuncs.com/peizhong/codeplay:v0.0.3 .
 	sudo docker push registry.cn-shenzhen.aliyuncs.com/peizhong/codeplay:v0.0.3
+
+lamdba_sampleapi:
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -tags lambda.norpc -o cmd/lambda/sampleapi/bootstrap cmd/lambda/sampleapi/main.go
+	cd cmd/lambda/sampleapi && zip myFunction.zip bootstrap

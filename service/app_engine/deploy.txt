@@ -2,7 +2,7 @@ typemeta:
     kind: ""
     apiversion: ""
 objectmeta:
-    name: test
+    name: test-nginx
     generatename: ""
     namespace: ""
     selflink: ""
@@ -21,7 +21,7 @@ spec:
     replicas: null
     selector:
         matchlabels:
-            app: test
+            app: test-nginx
         matchexpressions: []
     template:
         objectmeta:
@@ -36,7 +36,7 @@ spec:
             deletiontimestamp: null
             deletiongraceperiodseconds: null
             labels:
-                app: test
+                app: test-nginx
             annotations:
                 prometheus.io/scrape: "true"
             ownerreferences: []

@@ -1,2 +1,5 @@
 testdata/
 node_modules/
+
+cmd/lambda/sampleapi/bootstrap
+cmd/lambda/sampleapi/myFunction.zip
