@@ -37,4 +37,4 @@ fast_build:
 
 lamdba_sampleapi:
 	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -tags lambda.norpc -o cmd/lambda/sampleapi/bootstrap cmd/lambda/sampleapi/main.go
-	cd cmd/lambda/sampleapi && zip myFunction.zip bootstrap
+	cd cmd/lambda/sampleapi && zip myFunction.zip bootstrap && rm bootstrap

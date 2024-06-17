@@ -1,12 +1,12 @@
 package lambda
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 
-	"github.com/aws/aws-lambda-go/events"
 	aws_event "github.com/aws/aws-lambda-go/events"
 	aws_lambda "github.com/aws/aws-lambda-go/lambda"
 	"github.com/oklog/run"
@@ -18,11 +18,11 @@ type APIResponse struct {
 	ErrMsg string `json:"err_msg,omitempty"`
 }
 
-type Handler func(request aws_event.APIGatewayProxyRequest) (aws_event.APIGatewayProxyResponse, error)
+type Handler func(ctx context.Context, request aws_event.APIGatewayProxyRequest) (aws_event.APIGatewayProxyResponse, error)
 
-var sampleHandler Handler = func(request aws_event.APIGatewayProxyRequest) (aws_event.APIGatewayProxyResponse, error) {
+var sampleHandler Handler = func(ctx context.Context, request aws_event.APIGatewayProxyRequest) (aws_event.APIGatewayProxyResponse, error) {
 	hostname, _ := os.Hostname()
-	msg := fmt.Sprintf("this is message from %s", hostname)
+	msg := fmt.Sprintf("this is message from %s with method:[%s]", hostname, request.HTTPMethod)
 	return responseSuccess([]byte(msg)), nil
 }
 
@@ -32,7 +32,7 @@ func responseSuccess(data []byte) aws_event.APIGatewayProxyResponse {
 		Code: http.StatusOK,
 	}
 	bs, _ := json.Marshal(resp)
-	return events.APIGatewayProxyResponse{
+	return aws_event.APIGatewayProxyResponse{
 		Body:       string(bs),
 		StatusCode: http.StatusOK,
 	}
